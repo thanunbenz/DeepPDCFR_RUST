@@ -1,0 +1,67 @@
+# Rust build artifacts
+target/
+**/target/
+**/*.rs.bk
+*.pdb
+
+# Cargo lock file (include for binaries, exclude for libraries)
+# Uncomment if this is a library
+# Cargo.lock
+
+# Debug artifacts
+debug/
+**/.fingerprint/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.fleet/
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Python (if using for ML components)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+*.profraw
+*.profdata
+coverage/
+
+# Documentation
+target/doc/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~
