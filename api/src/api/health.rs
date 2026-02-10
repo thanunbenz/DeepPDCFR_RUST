@@ -1,4 +1,4 @@
-use axum::{response::Json, http::StatusCode};
+use actix_web::HttpResponse;
 use crate::models::HealthResponse;
 
 /// Health check endpoint
@@ -11,6 +11,6 @@ use crate::models::HealthResponse;
     ),
     tag = "System"
 )]
-pub async fn health() -> (StatusCode, Json<HealthResponse>) {
-    (StatusCode::OK, Json(HealthResponse::default()))
+pub async fn health() -> HttpResponse {
+    HttpResponse::Ok().json(HealthResponse::default())
 }

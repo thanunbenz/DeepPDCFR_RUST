@@ -4,11 +4,8 @@ pub mod error;
 pub mod mock_data;
 pub mod models;
 
-use axum::{
-    routing::{get, post},
-    Router,
-};
-use tower_http::cors::{Any, CorsLayer};
+use actix_web::web;
+use actix_cors::Cors;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -54,24 +51,23 @@ use crate::{
 )]
 struct ApiDoc;
 
-/// Create the application router with all routes and middleware
-pub fn create_app() -> Router {
-    // Configure CORS to allow all origins (matching Python server)
-    let cors = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
+/// Configure application routes and services
+pub fn configure_app(cfg: &mut web::ServiceConfig) {
+    cfg.route("/health", web::get().to(health))
+        .route("/v1/solve", web::post().to(solve));
+}
 
-    // Create API routes
-    let api_routes = Router::new()
-        .route("/health", get(health))
-        .route("/v1/solve", post(solve));
+/// Create Swagger UI service
+pub fn create_swagger() -> SwaggerUi {
+    SwaggerUi::new("/docs/{_:.*}").url("/api-docs/openapi.json", ApiDoc::openapi())
+}
 
-    // Merge routes with Swagger UI
-    Router::new()
-        .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .merge(api_routes)
-        .layer(cors)
+/// Create CORS middleware configuration
+pub fn create_cors() -> Cors {
+    Cors::default()
+        .allow_any_origin()
+        .allow_any_method()
+        .allow_any_header()
 }
 
 /// Get server configuration

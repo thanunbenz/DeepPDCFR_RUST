@@ -1,8 +1,4 @@
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    Json,
-};
+use actix_web::{http::StatusCode, HttpResponse, ResponseError};
 use serde::Serialize;
 use std::fmt;
 use utoipa::ToSchema;
@@ -34,24 +30,26 @@ pub struct ErrorDetail {
     pub message: String,
 }
 
-impl IntoResponse for AppError {
-    fn into_response(self) -> Response {
-        let (status, error_code, message) = match self {
-            AppError::ValidationError(msg) => {
-                (StatusCode::UNPROCESSABLE_ENTITY, "validation_error", msg)
-            }
-            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, "not_found", msg),
-            AppError::Internal(msg) => {
-                (StatusCode::INTERNAL_SERVER_ERROR, "internal_error", msg)
-            }
+impl ResponseError for AppError {
+    fn status_code(&self) -> StatusCode {
+        match self {
+            AppError::ValidationError(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            AppError::NotFound(_) => StatusCode::NOT_FOUND,
+            AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        let (error_code, message) = match self {
+            AppError::ValidationError(msg) => ("validation_error", msg.clone()),
+            AppError::NotFound(msg) => ("not_found", msg.clone()),
+            AppError::Internal(msg) => ("internal_error", msg.clone()),
         };
 
-        let body = Json(ErrorDetail {
+        HttpResponse::build(self.status_code()).json(ErrorDetail {
             error: error_code.to_string(),
             message,
-        });
-
-        (status, body).into_response()
+        })
     }
 }
 

@@ -1,13 +1,14 @@
-use deeppdcfr_mock_server::{create_app, get_config};
+use deeppdcfr_mock_server::{configure_app, create_cors, create_swagger, get_config};
+use actix_web::{App, HttpServer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-#[tokio::main]
-async fn main() {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     // Initialize tracing
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "deeppdcfr_mock_server=info,tower_http=debug".into()),
+                .unwrap_or_else(|_| "deeppdcfr_mock_server=info,actix_web=debug".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
@@ -16,19 +17,17 @@ async fn main() {
     let config = get_config();
     let addr = config.addr;
 
-    // Create app
-    let app = create_app();
-
-    // Create TCP listener
-    let listener = tokio::net::TcpListener::bind(&addr)
-        .await
-        .expect("Failed to bind address");
-
     tracing::info!("🚀 Server starting on http://{}", addr);
     tracing::info!("📚 Swagger UI available at http://{}/docs", addr);
 
     // Run server
-    axum::serve(listener, app)
-        .await
-        .expect("Server error");
+    HttpServer::new(move || {
+        App::new()
+            .wrap(create_cors())
+            .service(create_swagger())
+            .configure(configure_app)
+    })
+    .bind(&addr)?
+    .run()
+    .await
 }

@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, Json};
+use actix_web::{web, HttpResponse};
 
 use crate::{
     error::AppError,
@@ -22,11 +22,14 @@ use crate::{
     tag = "Solver"
 )]
 pub async fn solve(
-    Json(req): Json<SolveRequest>,
-) -> Result<(StatusCode, Json<SolveResponse>), AppError> {
+    req: web::Json<SolveRequest>,
+) -> Result<HttpResponse, AppError> {
     // Get mock data
     let actions = get_mock_actions();
     let combos = get_mock_combos();
+
+    // Extract inner SolveRequest
+    let req = req.into_inner();
 
     // Build response matching the request
     let response = SolveResponse {
@@ -39,5 +42,5 @@ pub async fn solve(
         combos,
     };
 
-    Ok((StatusCode::OK, Json(response)))
+    Ok(HttpResponse::Ok().json(response))
 }
