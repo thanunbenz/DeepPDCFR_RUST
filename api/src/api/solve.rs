@@ -17,7 +17,7 @@ use crate::{
     request_body = SolveRequest,
     responses(
         (status = 200, description = "Successfully computed strategy", body = SolveResponse),
-        (status = 422, description = "Validation error", body = crate::error::ErrorDetail)
+        (status = 422, description = "Validation error", body = ErrorDetail)
     ),
     tag = "Solver"
 )]

@@ -4,5 +4,5 @@ pub mod response;
 
 // Re-export commonly used types
 pub use health::HealthResponse;
-pub use request::{BetSizes, HistoryAction, Player, SolveRequest};
-pub use response::{ActionInfo, HandStrategy, SolveResponse};
+pub use request::{ActionType, BetSizes, HistoryAction, Player, SolveRequest};
+pub use response::{ActionInfo, ActionTypeResponse, HandStrategy, SolveResponse};

@@ -18,7 +18,7 @@ async fn main() -> std::io::Result<()> {
     let addr = config.addr;
 
     tracing::info!("🚀 Server starting on http://{}", addr);
-    tracing::info!("📚 Swagger UI available at http://{}/docs", addr);
+    tracing::info!("📚 Swagger UI available at http://{}/docs/", addr);
 
     // Run server
     HttpServer::new(move || {

@@ -3,6 +3,7 @@ pub mod config;
 pub mod error;
 pub mod mock_data;
 pub mod models;
+pub mod solver;
 
 use actix_web::web;
 use actix_cors::Cors;
@@ -12,10 +13,11 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::{
     api::{health, solve},
     config::Config,
+    error::ErrorDetail,
     models::{
         health::HealthResponse,
-        request::{BetSizes, HistoryAction, Player, SolveRequest},
-        response::{ActionInfo, HandStrategy, SolveResponse},
+        request::{ActionType, BetSizes, HistoryAction, Player, SolveRequest},
+        response::{ActionInfo, ActionTypeResponse, HandStrategy, SolveResponse},
     },
 };
 
@@ -39,9 +41,11 @@ use crate::{
             BetSizes,
             HistoryAction,
             Player,
+            ActionType,
             ActionInfo,
+            ActionTypeResponse,
             HandStrategy,
-            crate::error::ErrorDetail,
+            ErrorDetail,
         )
     ),
     tags(
@@ -53,8 +57,16 @@ struct ApiDoc;
 
 /// Configure application routes and services
 pub fn configure_app(cfg: &mut web::ServiceConfig) {
+    use actix_web::HttpResponse;
+
     cfg.route("/health", web::get().to(health))
-        .route("/v1/solve", web::post().to(solve));
+        .route("/v1/solve", web::post().to(solve))
+        // Redirect /docs to /docs/
+        .route("/docs", web::get().to(|| async {
+            HttpResponse::PermanentRedirect()
+                .append_header(("Location", "/docs/"))
+                .finish()
+        }));
 }
 
 /// Create Swagger UI service
